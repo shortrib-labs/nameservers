@@ -8,7 +8,9 @@ fqdn: ${hostname}.${domain}
 hostname: ${hostname}
 
 ssh_authorized_keys:
-${ssh_authorized_keys}
+%{ for key in ssh_authorized_keys ~}
+- "${key}"
+%{ endfor ~}
 
 chpasswd:
   expire: false
@@ -28,7 +30,34 @@ groups:
 - ssher
 
 users:
-${users}
+%{ for user in users ~}
+%{ if user == "default" ~}
+- default
+%{ else ~}
+- name: ${user.name}
+%{ if lookup(user, "gecos", "") != "" ~}
+  gecos: "${user.gecos}"
+%{ endif ~}
+%{ if lookup(user, "groups", []) != [] ~}
+  groups:
+%{ for group in user.groups ~}
+  - ${group}
+%{ endfor ~}
+%{ endif ~}
+%{ if lookup(user, "ssh_import_id", []) != [] ~}
+  ssh_import_id:
+%{ for id in user.ssh_import_id ~}
+  - ${id}
+%{ endfor ~}
+%{ endif ~}
+%{ if lookup(user, "sudo", "") != "" ~}
+  sudo: ${user.sudo}
+%{ endif ~}
+%{ if lookup(user, "lock_passwd", false) ~}
+  lock_passwd: true
+%{ endif ~}
+%{ endif ~}
+%{ endfor ~}
 
 # Update apt database and upgrade packages on first boot
 package_update: true
@@ -138,46 +167,46 @@ write_files:
 # Knot DNS authoritative server configuration
 - path: /etc/knot/knot.conf
   content: |
-${indent(4, knot_config)}
+    ${indent(4, trimspace(knot_config))}
   permissions: '0640'
   owner: knot:knot
 
 # Knot Resolver configuration
 - path: /etc/knot-resolver/kresd.conf
   content: |
-${indent(4, kresd_config)}
+    ${indent(4, trimspace(kresd_config))}
   permissions: '0644'
   owner: root:root
 
 # TLS certificate for DNS-over-TLS and DNS-over-QUIC
 - path: /etc/knot/dns.${domain}.crt
   content: |
-${indent(4, tls_cert)}
+    ${indent(4, trimspace(tls_cert))}
   permissions: '0644'
   owner: knot:knot
 
 - path: /etc/knot/dns.${domain}.key
   content: |
-${indent(4, tls_key)}
+    ${indent(4, trimspace(tls_key))}
   permissions: '0600'
   owner: knot:knot
 
 - path: /etc/knot/root_ca.crt
   content: |
-${indent(4, tls_ca)}
+    ${indent(4, trimspace(tls_ca))}
   permissions: '0644'
   owner: knot:knot
 
 # Symlink certs for Knot Resolver (uses different paths)
 - path: /etc/knot-resolver/dns.${domain}.crt
   content: |
-${indent(4, tls_cert)}
+    ${indent(4, trimspace(tls_cert))}
   permissions: '0644'
   owner: root:root
 
 - path: /etc/knot-resolver/dns.${domain}.key
   content: |
-${indent(4, tls_key)}
+    ${indent(4, trimspace(tls_key))}
   permissions: '0600'
   owner: knot-resolver:knot-resolver
 

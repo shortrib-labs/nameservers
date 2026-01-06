@@ -55,8 +55,8 @@ resource "nutanix_virtual_machine" "secondary" {
   guest_customization_cloud_init_user_data = base64encode(
     templatefile("${local.directories.templates}/user-data.tftpl", {
       # User configuration
-      ssh_authorized_keys = yamlencode(var.ssh_authorized_keys)
-      users               = yamlencode(local.users)
+      ssh_authorized_keys = var.ssh_authorized_keys
+      users               = local.users
 
       # Server identity
       hostname   = var.secondaries[count.index]
