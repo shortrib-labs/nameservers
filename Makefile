@@ -29,21 +29,6 @@ nutanix_prism_central = "$(shell yq e .nutanix.prism_central $(params_yaml))"
 nutanix_cluster_name = "$(shell yq e .nutanix.cluster $(params_yaml))"
 nutanix_storage_container = $(shell yq e '.nutanix.storage_container // "null"' $(params_yaml))
 
-infra_subnet = {
-  vlan_id = $(shell yq e .subnets.infra.vlan_id $(params_yaml))
-  cidr = "$(shell yq e .subnets.infra.cidr $(params_yaml))"
-  gateway = "$(shell yq e .subnets.infra.gateway $(params_yaml))"
-  pool_start = "$(shell yq e .subnets.infra.pool_start $(params_yaml))"
-  pool_end = "$(shell yq e .subnets.infra.pool_end $(params_yaml))"
-}
-
-management_subnet = {
-  vlan_id = $(shell yq e .subnets.management.vlan_id $(params_yaml))
-  cidr = "$(shell yq e .subnets.management.cidr $(params_yaml))"
-  gateway = "$(shell yq e .subnets.management.gateway $(params_yaml))"
-  pool_start = "$(shell yq e .subnets.management.pool_start $(params_yaml))"
-  pool_end = "$(shell yq e .subnets.management.pool_end $(params_yaml))"
-}
 
 octodns_allowed_ranges = $(shell yq --output-format json .octodns.allowed_ranges $(params_yaml))
 

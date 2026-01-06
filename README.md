@@ -150,21 +150,6 @@ nameservers:
     - 10.105.0.3
     - 10.105.0.4
 
-# Subnet configuration
-subnets:
-  infra:
-    vlan_id: 105
-    cidr: 10.105.0.0/16
-    gateway: 10.105.0.1
-    pool_start: 10.105.0.100
-    pool_end: 10.105.0.250
-  management:
-    vlan_id: 100              # Your management VLAN
-    cidr: 10.100.0.0/16       # Your management CIDR
-    gateway: 10.100.0.1
-    pool_start: 10.100.0.100
-    pool_end: 10.100.0.250
-
 # TLS certificates for DNS-over-TLS/QUIC
 tls:
   cert: |

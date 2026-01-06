@@ -94,28 +94,6 @@ variable "nutanix_storage_container" {
   default     = null
 }
 
-# Subnet configuration
-variable "infra_subnet" {
-  type = object({
-    vlan_id    = number
-    cidr       = string
-    gateway    = string
-    pool_start = string
-    pool_end   = string
-  })
-  description = "Infrastructure subnet configuration for DNS services"
-}
-
-variable "management_subnet" {
-  type = object({
-    vlan_id    = number
-    cidr       = string
-    gateway    = string
-    pool_start = string
-    pool_end   = string
-  })
-  description = "Management subnet configuration for SSH access"
-}
 
 # OctoDNS configuration
 variable "octodns_allowed_ranges" {
