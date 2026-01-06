@@ -114,7 +114,17 @@ MAC addresses use OUI `52:54:00` followed by the last 3 octets of the IP address
 
 ## Quick Start
 
-### 1. Configure Parameters
+### 1. Setup
+
+After cloning, configure git hooks:
+
+```shell
+make setup
+```
+
+This enables the pre-commit hook that prevents committing unencrypted secrets.
+
+### 2. Configure Parameters
 
 Copy and edit the parameters file:
 
@@ -167,13 +177,13 @@ tls:
     -----END CERTIFICATE-----
 ```
 
-### 2. Encrypt Secrets
+### 3. Encrypt Secrets
 
 ```shell
 make encrypt
 ```
 
-### 3. Deploy
+### 4. Deploy
 
 ```shell
 # Initialize Terraform
@@ -186,7 +196,7 @@ make plan
 make servers
 ```
 
-### 4. Get TSIG Key for OctoDNS
+### 5. Get TSIG Key for OctoDNS
 
 ```shell
 make show-tsig
@@ -226,6 +236,7 @@ providers:
 
 | Target | Description |
 |--------|-------------|
+| `make setup` | Configure git hooks (run after cloning) |
 | `make init` | Initialize Terraform |
 | `make plan` | Preview infrastructure changes |
 | `make servers` | Deploy/update nameservers |

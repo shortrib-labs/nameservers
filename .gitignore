@@ -1,5 +1,6 @@
 .worktrees
 secrets/*
+!secrets/params.yaml
 !secrets/REDACTED-params.yaml
 !secrets/README.md
 work/*

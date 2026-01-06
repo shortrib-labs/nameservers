@@ -1,3 +1,7 @@
+.PHONY: setup
+setup:
+	@git config core.hooksPath .githooks
+
 tfvars := ${SECRETS_DIR}/terraform.tfvars
 params_yaml := ${SECRETS_DIR}/params.yaml
 
