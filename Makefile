@@ -17,9 +17,7 @@ users = "$(shell yq --output-format json .users $(params_yaml) | sed 's/"/\\"/g'
 primary = "$(shell yq e .nameservers.primary $(params_yaml))"
 secondaries = $(shell yq --output-format json .nameservers.secondaries $(params_yaml))
 resolver_ips = $(shell yq --output-format json .nameservers.resolver_ips $(params_yaml))
-resolver_macs = $(shell yq --output-format json .nameservers.resolver_macs $(params_yaml))
 auth_ips = $(shell yq --output-format json .nameservers.auth_ips $(params_yaml))
-auth_macs = $(shell yq --output-format json .nameservers.auth_macs $(params_yaml))
 
 cpus = $(shell yq e .node.cpus $(params_yaml))
 memory = $(shell yq e .node.memory $(params_yaml))

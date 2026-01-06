@@ -46,15 +46,6 @@ variable "auth_ips" {
   description = "Specific IPs for authoritative DNS service (one per server)"
 }
 
-variable "resolver_macs" {
-  type        = list(string)
-  description = "MAC addresses for resolver NICs (for DHCP reservations)"
-}
-
-variable "auth_macs" {
-  type        = list(string)
-  description = "MAC addresses for authoritative NICs (for DHCP reservations)"
-}
 
 # Node sizing
 variable "cpus" {
@@ -179,9 +170,22 @@ locals {
   # Map hostname to auth IP
   auth_ip_map = zipmap(local.all_servers, var.auth_ips)
 
-  # Map hostname to MAC addresses (for DHCP reservations on EdgeRouter)
-  resolver_mac_map = zipmap(local.all_servers, var.resolver_macs)
-  auth_mac_map     = zipmap(local.all_servers, var.auth_macs)
+  # Derive MAC addresses from IPs: 52:54:00 + last 3 octets as hex
+  # Example: 10.105.0.252 -> 52:54:00:69:00:fc
+  resolver_mac_map = { for server in local.all_servers : server =>
+    format("52:54:00:%02x:%02x:%02x",
+      tonumber(split(".", local.resolver_ip_map[server])[1]),
+      tonumber(split(".", local.resolver_ip_map[server])[2]),
+      tonumber(split(".", local.resolver_ip_map[server])[3])
+    )
+  }
+  auth_mac_map = { for server in local.all_servers : server =>
+    format("52:54:00:%02x:%02x:%02x",
+      tonumber(split(".", local.auth_ip_map[server])[1]),
+      tonumber(split(".", local.auth_ip_map[server])[2]),
+      tonumber(split(".", local.auth_ip_map[server])[3])
+    )
+  }
 
   # Map hostname to index (for secondaries)
   secondary_index_map = { for idx, name in var.secondaries : name => idx }

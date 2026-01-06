@@ -60,13 +60,13 @@ Each nameserver has **two IPs**: one for the resolver service and one for the au
 └───────────────────────────────────────────────────┘  └───────────────────────────────────────────────────┘
 ```
 
-### IP and MAC Address Summary
+### IP Address Summary
 
-| Server | Resolver IP | Resolver MAC | Auth IP | Auth MAC |
-|--------|-------------|--------------|---------|----------|
-| cooper | 10.105.0.252 | 52:54:00:69:00:fc | 10.105.0.2 | 52:54:00:69:00:02 |
-| maltman | 10.105.0.253 | 52:54:00:69:00:fd | 10.105.0.3 | 52:54:00:69:00:03 |
-| stillman | 10.105.0.254 | 52:54:00:69:00:fe | 10.105.0.4 | 52:54:00:69:00:04 |
+| Server | Resolver IP | Auth IP |
+|--------|-------------|---------|
+| cooper | 10.105.0.252 | 10.105.0.2 |
+| maltman | 10.105.0.253 | 10.105.0.3 |
+| stillman | 10.105.0.254 | 10.105.0.4 |
 
 IPs are assigned via DHCP reservations on EdgeRouter based on MAC addresses.
 
@@ -74,13 +74,13 @@ IPs are assigned via DHCP reservations on EdgeRouter based on MAC addresses.
 
 Each nameserver has three NICs with MAC-based DHCP reservations on EdgeRouter:
 
-| NIC | Subnet | MAC Pattern | Purpose |
-|-----|--------|-------------|---------|
-| NIC 1 | `infra` | 52:54:00:69:00:xx | Resolver service |
-| NIC 2 | `infra` | 52:54:00:69:00:xx | Authoritative service |
-| NIC 3 | `management` | (auto) | SSH access |
+| NIC | Subnet | Purpose |
+|-----|--------|---------|
+| NIC 1 | `infra` | Resolver service |
+| NIC 2 | `infra` | Authoritative service |
+| NIC 3 | `management` | SSH access |
 
-MAC addresses use OUI `52:54:00` followed by the last 3 octets of the IP address.
+MAC addresses are derived from IPs using OUI `52:54:00` + last 3 octets as hex. For example, `10.105.0.252` becomes `52:54:00:69:00:fc`.
 
 ### Protocol Support
 
@@ -135,16 +135,20 @@ cp secrets/REDACTED-params.yaml secrets/params.yaml
 Edit `secrets/params.yaml` to configure:
 
 ```yaml
-# Nameserver hostnames
+# Nameserver hostnames and IPs
 nameservers:
   primary: cooper
   secondaries:
     - maltman
     - stillman
-  resolver_ips:
+  resolver_ips:          # One per server (primary, then secondaries)
     - 10.105.0.252
     - 10.105.0.253
     - 10.105.0.254
+  auth_ips:              # One per server (primary, then secondaries)
+    - 10.105.0.2
+    - 10.105.0.3
+    - 10.105.0.4
 
 # Subnet configuration
 subnets:
