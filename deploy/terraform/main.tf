@@ -4,15 +4,13 @@ data "nutanix_cluster" "cluster" {
 }
 
 # Infrastructure subnet for DNS services
-# NOTE: Subnet must exist with IPAM configured. See params.yaml for expected configuration.
 data "nutanix_subnet" "infra" {
-  subnet_name = "infra"
+  subnet_name = var.infra_subnet
 }
 
 # Management subnet for SSH access
-# NOTE: Subnet must exist with IPAM configured. See params.yaml for expected configuration.
 data "nutanix_subnet" "management" {
-  subnet_name = "management"
+  subnet_name = var.management_subnet
 }
 
 # Ubuntu cloud image for nameservers

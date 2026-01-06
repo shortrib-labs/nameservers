@@ -29,6 +29,8 @@ nutanix_prism_central = "$(shell yq e .nutanix.prism_central $(params_yaml))"
 nutanix_cluster_name = "$(shell yq e .nutanix.cluster $(params_yaml))"
 nutanix_storage_container = $(shell yq e '.nutanix.storage_container // "null"' $(params_yaml))
 
+infra_subnet = "$(shell yq e '.subnets.infra // "infra"' $(params_yaml))"
+management_subnet = "$(shell yq e '.subnets.management // "management"' $(params_yaml))"
 
 octodns_allowed_ranges = $(shell yq --output-format json .octodns.allowed_ranges $(params_yaml))
 

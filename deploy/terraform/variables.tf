@@ -95,6 +95,19 @@ variable "nutanix_storage_container" {
 }
 
 
+# Subnet names (must exist in Nutanix with IPAM configured)
+variable "infra_subnet" {
+  type        = string
+  description = "Name of the infrastructure subnet for DNS services"
+  default     = "infra"
+}
+
+variable "management_subnet" {
+  type        = string
+  description = "Name of the management subnet for SSH access"
+  default     = "management"
+}
+
 # OctoDNS configuration
 variable "octodns_allowed_ranges" {
   type        = list(string)
