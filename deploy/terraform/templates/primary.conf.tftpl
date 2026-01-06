@@ -1,0 +1,77 @@
+# Knot DNS Primary Authoritative Server Configuration
+# See knot.conf(5) or refer to the server documentation.
+
+server:
+  rundir: "/run/knot"
+  user: knot:knot
+  automatic-acl: on
+
+  # TLS/QUIC certificate configuration
+  key-file: /etc/knot/dns.${domain}.key
+  cert-file: /etc/knot/dns.${domain}.crt
+  ca-file: /etc/knot/root_ca.crt
+
+  # Listen for unencrypted DNS (UDP/TCP) on auth IP and localhost
+  listen: [ ${auth_ip}@53, 127.0.0.1@53 ]
+
+  # Listen for DNS-over-TLS on auth IP
+  listen-tls: [ ${auth_ip}@853 ]
+
+  # Listen for DNS-over-QUIC on auth IP
+  listen-quic: [ ${auth_ip}@853 ]
+
+# Remote secondary servers for zone notification
+remote:
+%{ for idx, secondary in secondaries ~}
+  - id: ${secondary}
+    address: ${secondary_ips[idx]}@853
+    quic: on
+%{ endfor ~}
+
+# TSIG key for OctoDNS zone updates
+key:
+  - id: octodns
+    algorithm: hmac-sha256
+    secret: ${tsig_secret}
+
+# Access control lists
+acl:
+  # Allow OctoDNS to transfer and update zones
+  - id: octodns_update
+    action: [ transfer, update ]
+    key: octodns
+%{ if length(octodns_clients) > 0 ~}
+    address: [ ${join(", ", octodns_clients)} ]
+%{ endif ~}
+
+  # Allow zone transfers to secondary servers
+  - id: secondary_xfr
+    action: transfer
+%{ if length(secondaries) > 0 ~}
+    address: [ ${join(", ", [for s in secondaries : "${s}.${domain}"])} ]
+%{ endif ~}
+
+log:
+  - target: syslog
+    any: info
+
+database:
+  storage: "/var/lib/knot"
+
+template:
+  - id: default
+    storage: "/var/lib/knot/zones"
+    file: "%s.zone"
+    serial-policy: dateserial
+    journal-content: all
+
+# Zone configuration
+zone:
+%{ for zone in dns_zones ~}
+  - domain: ${zone}
+    template: default
+%{ if length(secondaries) > 0 ~}
+    notify: [ ${join(", ", secondaries)} ]
+%{ endif ~}
+    acl: [ octodns_update, secondary_xfr ]
+%{ endfor ~}

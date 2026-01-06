@@ -1,0 +1,51 @@
+# Knot DNS Secondary Authoritative Server Configuration
+# See knot.conf(5) or refer to the server documentation.
+
+server:
+  rundir: "/run/knot"
+  user: knot:knot
+  automatic-acl: on
+
+  # TLS/QUIC certificate configuration
+  key-file: /etc/knot/dns.${domain}.key
+  cert-file: /etc/knot/dns.${domain}.crt
+  ca-file: /etc/knot/root_ca.crt
+
+  # Listen for unencrypted DNS only on localhost (for local resolver)
+  listen: [ 127.0.0.1@53 ]
+
+  # Listen for DNS-over-TLS on auth IP
+  listen-tls: [ ${auth_ip}@853 ]
+
+  # Listen for DNS-over-QUIC on auth IP
+  listen-quic: [ ${auth_ip}@853 ]
+
+# Primary server configuration
+remote:
+  - id: primary
+    address: ${primary_ip}@853
+    cert-hostname: ${primary_hostname}
+    quic: on
+
+# Access control lists
+acl:
+  # Accept NOTIFY from primary server
+  - id: primary_notify
+    address: ${primary_ip}
+    action: notify
+
+log:
+  - target: syslog
+    any: info
+
+database:
+  storage: "/var/lib/knot"
+
+# Zone configuration - secondary/slave zones
+zone:
+%{ for zone in dns_zones ~}
+  - domain: ${zone}
+    storage: "/var/lib/knot/zones"
+    master: primary
+    acl: primary_notify
+%{ endfor ~}
