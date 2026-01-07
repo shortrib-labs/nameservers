@@ -166,6 +166,7 @@ write_files:
 
 # Knot DNS authoritative server configuration
 - path: /etc/knot/knot.conf
+  defer: true
   content: |
     ${indent(4, trimspace(knot_config))}
   permissions: '0640'
@@ -173,6 +174,7 @@ write_files:
 
 # Knot Resolver configuration
 - path: /etc/knot-resolver/kresd.conf
+  defer: true
   content: |
     ${indent(4, trimspace(kresd_config))}
   permissions: '0644'
@@ -180,18 +182,21 @@ write_files:
 
 # TLS certificate for DNS-over-TLS and DNS-over-QUIC
 - path: /etc/knot/dns.${domain}.crt
+  defer: true
   content: |
     ${indent(4, trimspace(tls_cert))}
   permissions: '0644'
   owner: knot:knot
 
 - path: /etc/knot/dns.${domain}.key
+  defer: true
   content: |
     ${indent(4, trimspace(tls_key))}
   permissions: '0600'
   owner: knot:knot
 
 - path: /etc/knot/root_ca.crt
+  defer: true
   content: |
     ${indent(4, trimspace(tls_ca))}
   permissions: '0644'
@@ -199,12 +204,14 @@ write_files:
 
 # Symlink certs for Knot Resolver (uses different paths)
 - path: /etc/knot-resolver/dns.${domain}.crt
+  defer: true
   content: |
     ${indent(4, trimspace(tls_cert))}
   permissions: '0644'
   owner: root:root
 
 - path: /etc/knot-resolver/dns.${domain}.key
+  defer: true
   content: |
     ${indent(4, trimspace(tls_key))}
   permissions: '0600'

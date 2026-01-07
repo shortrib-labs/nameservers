@@ -7,21 +7,19 @@ output "resolver_ips" {
 
 output "primary_nameserver" {
   value = {
-    hostname      = var.primary
-    infra_ip      = data.nutanix_virtual_machine.primary.nic_list[0].ip_endpoint_list[0].ip
-    management_ip = data.nutanix_virtual_machine.primary.nic_list[1].ip_endpoint_list[0].ip
-    resolver_ip   = local.resolver_ip_map[var.primary]
+    hostname    = var.primary
+    resolver_ip = local.resolver_ip_map[var.primary]
+    auth_ip     = local.auth_ip_map[var.primary]
   }
   description = "Primary nameserver details"
 }
 
 output "secondary_nameservers" {
   value = [
-    for idx, name in var.secondaries : {
-      hostname      = name
-      infra_ip      = data.nutanix_virtual_machine.secondary[idx].nic_list[0].ip_endpoint_list[0].ip
-      management_ip = data.nutanix_virtual_machine.secondary[idx].nic_list[1].ip_endpoint_list[0].ip
-      resolver_ip   = local.resolver_ip_map[name]
+    for name in var.secondaries : {
+      hostname    = name
+      resolver_ip = local.resolver_ip_map[name]
+      auth_ip     = local.auth_ip_map[name]
     }
   ]
   description = "Secondary nameserver details"

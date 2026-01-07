@@ -2,7 +2,7 @@
 # Runs both Knot Resolver (recursive) and Knot DNS (authoritative primary)
 
 resource "nutanix_virtual_machine" "primary" {
-  name        = var.primary
+  name        = "${var.primary}.${var.domain}"
   description = "Primary nameserver - authoritative DNS primary + resolver"
 
   # CPU and memory configuration
@@ -106,18 +106,3 @@ resource "nutanix_virtual_machine" "primary" {
   }
 }
 
-# Read primary VM data after creation to get assigned IPs
-data "nutanix_virtual_machine" "primary" {
-  vm_id = nutanix_virtual_machine.primary.id
-}
-
-# Output for debugging
-output "primary_infra_ip" {
-  value       = data.nutanix_virtual_machine.primary.nic_list[0].ip_endpoint_list[0].ip
-  description = "Primary nameserver infrastructure IP (from IPAM)"
-}
-
-output "primary_management_ip" {
-  value       = data.nutanix_virtual_machine.primary.nic_list[1].ip_endpoint_list[0].ip
-  description = "Primary nameserver management IP (from IPAM)"
-}

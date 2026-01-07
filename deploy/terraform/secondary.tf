@@ -3,7 +3,7 @@
 
 resource "nutanix_virtual_machine" "secondary" {
   count       = length(var.secondaries)
-  name        = var.secondaries[count.index]
+  name        = "${var.secondaries[count.index]}.${var.domain}"
   description = "Secondary nameserver - authoritative DNS secondary + resolver"
 
   # CPU and memory configuration
@@ -108,8 +108,3 @@ resource "nutanix_virtual_machine" "secondary" {
   depends_on = [nutanix_virtual_machine.primary]
 }
 
-# Read secondary VM data after creation to get assigned IPs
-data "nutanix_virtual_machine" "secondary" {
-  count = length(var.secondaries)
-  vm_id = nutanix_virtual_machine.secondary[count.index].id
-}
