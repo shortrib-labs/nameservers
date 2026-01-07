@@ -34,18 +34,6 @@ management_subnet = "$(shell yq e '.subnets.management // "management"' $(params
 
 octodns_allowed_ranges = $(shell yq --output-format json .octodns.allowed_ranges $(params_yaml))
 
-tls_cert = <<-EOF
-$(shell sops --decrypt --extract '["tls"]["cert"]' $(params_yaml))
-EOF
-
-tls_key = <<-EOF
-$(shell sops --decrypt --extract '["tls"]["key"]' $(params_yaml))
-EOF
-
-tls_ca = <<-EOF
-$(shell sops --decrypt --extract '["tls"]["ca"]' $(params_yaml))
-EOF
-
 tailscale_auth_key = "$(shell sops --decrypt --extract '["tailscale"]["auth_key"]' $(params_yaml) 2>/dev/null || echo '')"
 endef
 
@@ -53,8 +41,17 @@ endef
 tfvars: $(tfvars)
 
 export TFVARS
-$(tfvars): $(params_yaml)
+$(tfvars): $(params_yaml) 
 	@echo "$$TFVARS" > $@
+	@echo 'tls_cert = <<-EOF' >> $@
+	@sops --decrypt --extract '["tls"]["cert"]' $(params_yaml) >> $@
+	@echo 'EOF' >> $@
+	@echo 'tls_key = <<-EOF' >> $@
+	@sops --decrypt --extract '["tls"]["key"]' $(params_yaml) >> $@
+	@echo 'EOF' >> $@
+	@echo 'tls_ca = <<-EOF' >> $@
+	@sops --decrypt --extract '["tls"]["ca"]' $(params_yaml) >> $@
+	@echo 'EOF' >> $@
 
 .PHONY: init
 init: $(tfvars)
