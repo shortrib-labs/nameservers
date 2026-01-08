@@ -1,6 +1,7 @@
 .PHONY: setup
 setup:
 	@git config core.hooksPath .githooks
+	@pip install -r requirements.txt
 
 tfvars := ${SECRETS_DIR}/terraform.tfvars
 params_yaml := ${SECRETS_DIR}/params.yaml
@@ -18,6 +19,7 @@ primary = "$(shell yq e .nameservers.primary $(params_yaml))"
 secondaries = $(shell yq --output-format json .nameservers.secondaries $(params_yaml))
 resolver_ips = $(shell yq --output-format json .nameservers.resolver_ips $(params_yaml))
 auth_ips = $(shell yq --output-format json .nameservers.auth_ips $(params_yaml))
+management_ips = $(shell yq --output-format json .nameservers.management_ips $(params_yaml))
 
 cpus = $(shell yq e .node.cpus $(params_yaml))
 memory = $(shell yq e .node.memory $(params_yaml))
@@ -84,3 +86,12 @@ decrypt:
 .PHONY: show-tsig
 show-tsig:
 	@(cd ${DEPLOY_DIR}/terraform && terraform output -raw tsig_secret)
+
+sync: zones/*.yaml zones
+	octodns-sync --config-file octodns.yaml --doit
+
+dry-run\:sync: zones/*.yaml zones
+	octodns-sync --config-file octodns.yaml 
+
+force\:sync: zones/*.yaml zones
+	octodns-sync --config-file octodns.yaml --doit --force

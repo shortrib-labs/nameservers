@@ -1,0 +1,13 @@
+sendkeys_timeout: 0
+session: nameservers
+windows:
+- name: zsh
+  root: /home/crdant/workspace/nameservers
+  panes:
+  - commands: []
+  layout: tiled
+- name: nvim
+  root: /home/crdant/workspace/nameservers
+  commands:
+    - nvim
+

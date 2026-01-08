@@ -1,0 +1,2 @@
+octodns==1.15.0
+octodns-bind==1.0.1

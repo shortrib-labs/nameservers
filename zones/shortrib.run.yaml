@@ -1,0 +1,94 @@
+---
+# shortrib.run zone - runtime services
+
+'':
+  - type: NS
+    ttl: 3600
+    values: 
+      - cooper.lab.shortrib.net.
+      - maltman.lab.shortrib.net.
+      - stillman.lab.shortrib.net.
+
+ns1:
+  - type: CNAME 
+    ttl: 60
+    value: cooper.lab.shortrib.net.
+
+ns2:
+  - type: CNAME 
+    ttl: 60
+    value: maltman.lab.shortrib.net.
+
+ns3:
+  - type: CNAME 
+    ttl: 60
+    value: stillman.lab.shortrib.net.
+
+router:
+  - type: CNAME
+    ttl: 60
+    value: router.lab.shortrib.net.
+
+# kubernetes services
+spire:
+  - type: A
+    ttl: 60
+    value: 10.26.0.128
+
+vault:
+  - type: A
+    ttl: 60
+    value: 10.23.1.0
+
+minio:
+  - type: A
+    ttl: 60
+    value: 10.23.2.0
+
+s3:
+  - type: A
+    ttl: 60
+    value: 10.23.2.0
+
+# services
+shortrib-labs-e1:
+  - type: A
+    ttl: 60
+    value: 10.105.0.50
+
+shortrib-labs-r5:
+  - type: A
+    ttl: 60
+    value: 10.105.0.51
+
+acme:
+  - type: CNAME
+    ttl: 60
+    value: shortrib-labs-e1.shortrib.run.
+
+certificates:
+  - type: CNAME
+    ttl: 60
+    value: shortrib-labs-e1.shortrib.run.
+
+rsa:
+  - type: CNAME
+    ttl: 60
+    value: shortrib-labs-r5.shortrib.run.
+
+cooper:
+  - type: A
+    ttl: 60
+    value: 10.105.0.252
+
+maltman:
+  - type: A
+    ttl: 60
+    value: 10.105.0.253
+
+stillman:
+  - type: A
+    ttl: 60
+    value: 10.105.0.254
+
+

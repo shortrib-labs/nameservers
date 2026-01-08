@@ -1,0 +1,80 @@
+---
+# OctoDNS configuration for Knot DNS authoritative servers
+# See: https://github.com/octodns/octodns
+
+providers:
+  # Source: YAML zone files
+  yaml:
+    class: octodns.provider.yaml.YamlProvider
+    directory: ./zones
+    default_ttl: 60
+    enforce_order: false
+
+  # Target: Primary Knot DNS server via RFC 2136 dynamic updates
+  knot:
+    class: octodns_bind.Rfc2136Provider
+    # Primary authoritative server
+    host: 10.105.0.2
+    port: 53
+    # TSIG authentication
+    key_name: octodns
+    key_algorithm: hmac-sha256
+    # TSIG secret from environment variable (base64 encoded)
+    # Set OCTODNS_KNOT_KEY_SECRET before running
+    key_secret: env/OCTODNS_KNOT_KEY_SECRET
+
+# Zone configuration
+zones:
+  lab.shortrib.net.:
+    sources:
+      - yaml
+    targets:
+      - knot
+
+  shortrib.net.:
+    sources:
+      - yaml
+    targets:
+      - knot
+
+  shortrib.dev.:
+    sources:
+      - yaml
+    targets:
+      - knot
+
+  shortrib.app.:
+    sources:
+      - yaml
+    targets:
+      - knot
+
+  shortrib.run.:
+    sources:
+      - yaml
+    targets:
+      - knot
+
+  shortrib.io.:
+    sources:
+      - yaml
+    targets:
+      - knot
+
+  shortrib.sh.:
+    sources:
+      - yaml
+    targets:
+      - knot
+
+  shortrib.life.:
+    sources:
+      - yaml
+    targets:
+      - knot
+
+  replicated.run.:
+    sources:
+      - yaml
+    targets:
+      - knot

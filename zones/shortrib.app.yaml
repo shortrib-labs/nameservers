@@ -1,0 +1,48 @@
+---
+# shortrib.app zone - application services
+
+'':
+  - type: NS
+    ttl: 3600
+    values: 
+      - cooper.lab.shortrib.net.
+      - maltman.lab.shortrib.net.
+      - stillman.lab.shortrib.net.
+
+# infrastructure
+ns1:
+  - type: CNAME 
+    ttl: 60
+    value: cooper.lab.shortrib.net.
+
+ns2:
+  - type: CNAME 
+    ttl: 60
+    value: maltman.lab.shortrib.net.
+
+ns3:
+  - type: CNAME 
+    ttl: 60
+    value: stillman.lab.shortrib.net.
+
+# kubernetes services
+news:
+  - type: A
+    ttl: 60
+    value: 10.24.7.10
+
+'*':
+  - type: A
+    ttl: 60
+    value: 10.23.3.0
+
+# korifi on nutria
+'*.apps.korifi':
+  - type: A
+    ttl: 60
+    value: 10.26.0.232
+
+api.korifi:
+  - type: A
+    ttl: 60
+    value: 10.26.0.232
