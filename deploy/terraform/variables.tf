@@ -46,6 +46,16 @@ variable "auth_ips" {
   description = "Specific IPs for authoritative DNS service (one per server)"
 }
 
+variable "management_ips" {
+  type        = list(string)
+  description = "Specific IPs for management/SSH access (one per server)"
+}
+
+variable "ssh_user" {
+  type        = string
+  description = "SSH user for provisioner access"
+  default     = "crdant"
+}
 
 # Node sizing
 variable "cpus" {
@@ -160,6 +170,9 @@ locals {
 
   # Map hostname to auth IP
   auth_ip_map = zipmap(local.all_servers, var.auth_ips)
+
+  # Map hostname to management IP
+  management_ip_map = zipmap(local.all_servers, var.management_ips)
 
   # Derive MAC addresses from IPs: 52:54:00 + last 3 octets as hex
   # Example: 10.105.0.252 -> 52:54:00:69:00:fc

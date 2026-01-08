@@ -105,6 +105,27 @@ resource "nutanix_virtual_machine" "secondary" {
     ]
   }
 
+  # Wait for cloud-init to complete and restart DNS services
+  connection {
+    type  = "ssh"
+    user  = var.ssh_user
+    agent = true
+    host  = local.management_ip_map[var.secondaries[count.index]]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "cloud-init status --wait",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo systemctl restart knot",
+      "sudo systemctl restart kresd@1",
+    ]
+  }
+
   # Ensure primary is created first so we can get its IP
   depends_on = [nutanix_virtual_machine.primary]
 }
