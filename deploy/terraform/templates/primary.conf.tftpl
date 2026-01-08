@@ -47,8 +47,8 @@ acl:
   # Allow zone transfers to secondary servers
   - id: secondary_xfr
     action: transfer
-%{ if length(secondaries) > 0 ~}
-    address: [ ${join(", ", [for s in secondaries : "${s}.${domain}"])} ]
+%{ if length(secondary_ips) > 0 ~}
+    address: [ ${join(", ", secondary_ips)} ]
 %{ endif ~}
 
 log:

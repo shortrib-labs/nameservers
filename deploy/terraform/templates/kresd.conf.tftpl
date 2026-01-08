@@ -25,7 +25,7 @@ trust_anchors.set_insecure({
 -- All resolvers can forward to all authoritative servers for redundancy
 policy.add(policy.suffix(policy.TLS_FORWARD({
 %{ for auth_server in auth_servers ~}
-    {'${auth_server}@853', hostname='dns.${domain}', ca_file='/etc/ssl/certs/ca-certificates.crt'},
+    {'${auth_server}@853', hostname='dns.${domain}', ca_file='/etc/knot-resolver/root_ca.crt'},
 %{ endfor ~}
 }), {
 %{ for zone in dns_zones ~}
