@@ -1,0 +1,284 @@
+#cloud-config
+
+# Nameserver cloud-init configuration
+# Configures Knot DNS (authoritative) and Knot Resolver (recursive)
+
+prefer_fqdn_over_hostname: true
+fqdn: ${hostname}.${domain}
+hostname: ${hostname}
+
+ssh_authorized_keys:
+%{ for key in ssh_authorized_keys ~}
+- "${key}"
+%{ endfor ~}
+
+chpasswd:
+  expire: false
+
+packages:
+- open-vm-tools
+- ca-certificates
+- curl
+- zsh
+- neovim
+- jq
+- knot
+- knot-dnsutils
+- knot-resolver
+
+groups:
+- ssher
+
+users:
+%{ for user in users ~}
+%{ if user == "default" ~}
+- default
+%{ else ~}
+- name: ${user.name}
+%{ if lookup(user, "gecos", "") != "" ~}
+  gecos: "${user.gecos}"
+%{ endif ~}
+%{ if lookup(user, "groups", []) != [] ~}
+  groups:
+%{ for group in user.groups ~}
+  - ${group}
+%{ endfor ~}
+%{ endif ~}
+%{ if lookup(user, "ssh_import_id", []) != [] ~}
+  ssh_import_id:
+%{ for id in user.ssh_import_id ~}
+  - ${id}
+%{ endfor ~}
+%{ endif ~}
+%{ if lookup(user, "sudo", "") != "" ~}
+  sudo: ${user.sudo}
+%{ endif ~}
+%{ if lookup(user, "lock_passwd", false) ~}
+  lock_passwd: true
+%{ endif ~}
+%{ endif ~}
+%{ endfor ~}
+
+# Download CZ.NIC Labs GPG key before apt runs
+bootcmd:
+- mkdir -p /usr/share/keyrings
+- wget -q -O /usr/share/keyrings/cznic-labs-pkg.gpg https://pkg.labs.nic.cz/gpg
+
+# Update apt database and upgrade packages on first boot
+package_update: true
+package_upgrade: true
+
+# Add CZ.NIC Labs repositories for latest Knot DNS and Knot Resolver
+apt:
+  sources:
+    cznic-knot-dns:
+      source: "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-dns $RELEASE main"
+    cznic-knot-resolver:
+      source: "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-resolver $RELEASE main"
+
+ca_certs:
+  trusted:
+    # CN=Shortrib Labs Root E1
+    - |
+      -----BEGIN CERTIFICATE-----
+      MIIBpDCCAUqgAwIBAgIQMrjGbvdzyD63/WrEiob28DAKBggqhkjOPQQDAjAgMR4w
+      HAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3QgRTEwHhcNMjIwNTA2MDEwNzUwWhcN
+      MzIwNTAzMDEwNzUwWjAgMR4wHAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3QgRTEw
+      WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASH3xjMX2xsnDZ7G0dxuVunoH7ZT4qO
+      yNwQfYvMI/ZiuvNV8KyYLqrcD4cigiuVWmjvSAqT5TOkIcD8s10iWZSKo2YwZDAO
+      BgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4EFgQU6qmj
+      Isxj08Ks5oM4jNfNu/0QxhcwHwYDVR0jBBgwFoAU6qmjIsxj08Ks5oM4jNfNu/0Q
+      xhcwCgYIKoZIzj0EAwIDSAAwRQIgCs9bM8Ax8RnPuHZWrgZodf/vJ6dce7OFeOZr
+      mdHeKP8CIQC/KLNuScd9FfpazDzAZYYPHR9vnDWCkYsJ+2NaiKdOew==
+      -----END CERTIFICATE-----
+    # CN=Shortrib Labs Root R2
+    - |
+      -----BEGIN CERTIFICATE-----
+      MIIFDzCCAvegAwIBAgIQZUk6BivvZNk/u0uKj2lxJTANBgkqhkiG9w0BAQsFADAg
+      MR4wHAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3QgUjIwHhcNMjMwNDI1MTk0OTEw
+      WhcNMzMwNDIyMTk0OTEwWjAgMR4wHAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3Qg
+      UjIwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQC40NpmZ3L8CcPnnP6w
+      G47D/OqmV23QW/q6HppSAPMocuojCoP8Go+4g1Am38fjfbe5AQnSQcrN7xthaRCb
+      nO5BERR0p3rPUbupbb+AMqzlBFpuGaFMSeXwWF5qrb8gG6XNineLWaDpwwrpOaNt
+      fLyJw4VIHAsNEs3qkA5/ctv9eDUNmtq/e6jpy0vZSRDcEp0PMima9oE6evaaddj0
+      TXdQRmiVeABCMO0m8h7dVEQmDGZq7P1lIMS7ZZHx+/w8tFzDRSeQoy1DzQrh7XMu
+      cN3BpeM/05hUvGUSChD2keXy8FdjI+zhuSRTRHvRkOBDqvVZ4R4wv7MqWhgfzzzH
+      zkl5oA40zGehctKLhUXnHcZaHmkUyPkSrqHC0vW/cPsrEou/q36gw2rvuInfC3/F
+      G0pKKATISr7nMQ1JxWNb8tCh2sj38RaVKYyj2p9iayAxudb8mO1O1ThQdhsJd3mY
+      4FEGwRLFXyty+Kgyt7Orb0yZazdH7C5wjIYU98OGk9kFjGr+uveblJapIa1C1g+f
+      JU0nA1PAix13Sxi8jk9Nj4hV1gYmWKRLtzkk4229SR/7HNh9C3kOpdJyuCgVQiPu
+      Gtk1jECice23HQ/BQNw7DSwFErek+75NcpIak1nmJ2BCc2JCx6YBrq8C3XYg+++l
+      duzcOKPp6uk+GK6UvBVwhxUblwIDAQABo0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYD
+      VR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4EFgQU/Q7uclwplHgnbFpZDoGzPkGL8XIw
+      DQYJKoZIhvcNAQELBQADggIBACHHjD7PTeKRjO7kPY2Gij9Mvm1cEz1NP18Bfc/P
+      9aAqv6iPQc1JmJgakZY2HU+BSoIMZVLa2vogqWy/o5OIRUGNy86Iws/05Ub7y0U9
+      fALFLwExWXaYYw0j3UJOk//zDDfybqvHMQEgGQuG3c7Nx1lM3P0pbMThivOzqjO8
+      DBN01nhuhIHfdXNoW5bGG2HJ2YfYXhkfYV9kC3+hg4S9Bdo+lz+l+7WdThkqdPBT
+      /HsTV8Op3KNJ5POzleJr1SIdOIg1UJp8gxYAkiCzNcGecM8PrhMVaCCfrD2/4z5V
+      oa3xDmY8aqP92bTr5p4M86LZ7eEqBKEYWkJQe6/NZaiWHoNj1p+q36i98Mtr79iK
+      RL2O/jaxmgh974tdPn9R82RKtylnsQiJzeT3Cc+vl10jq2Ne7aNCD6e1YWWXbloK
+      tAGVJ+GnBMVVJTZRV2TRDB58+SrxnzeeY3JtXHSMGxw2WC6ijx0NwfnsV4IMfPZ1
+      827F0FULk3vw1zHTE3q0zq+HTzWE6/MwVHgxLpJQF/LWzG8wYCg+CS4dyPXW0qX1
+      3sLOOGhLKlSle8MsRgjSbrCiinxFPVu93iF8Kj60oAjtSh2g+fcsFCHqYawyM9e5
+      6j7IvnxgE55Ps8n0blQW91bP0J1D9FAyb4ULUmt9N0/o36m8SpKLBAYE3HSX6ctG
+      5lsk
+      -----END CERTIFICATE-----
+
+write_files:
+# SSH hardening configuration
+- path: /etc/ssh/sshd_config.d/01-hardening.conf
+  content: |
+    # enable ed25519 key
+    HostKey /etc/ssh/ssh_host_ed25519_key
+    # restrict supported key exchange, cipher, and MAC algorithms
+    KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+    MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
+    HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-512,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512-cert-v01@openssh.com
+    # restrict authentication mechanism
+    PasswordAuthentication yes
+    ChallengeResponseAuthentication no
+    PubkeyAuthentication yes
+  permissions: '0644'
+  owner: root:root
+
+- path: /etc/ssh/ssh_config.d/01-hardening.conf
+  content: |
+    Host github.com
+      KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+    Host *
+      # restrict supported key exchange, cipher, and MAC algorithms
+      KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+      Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+      MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
+      HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-512,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512-cert-v01@openssh.com
+      # restrict authentication mechanism
+      PasswordAuthentication no
+      ChallengeResponseAuthentication no
+      PubkeyAuthentication yes
+  permissions: '0644'
+  owner: root:root
+
+# Netplan configuration for all interfaces
+# IPs are assigned via DHCP reservations on EdgeRouter based on MAC addresses
+- path: /etc/netplan/60-dns-interfaces.yaml
+  content: |
+    network:
+      ethernets:
+        # NIC 1 - Resolver service
+        ens3:
+          dhcp4: true
+        # NIC 2 - Authoritative service
+        ens4:
+          dhcp4: true
+        # NIC 3 - Management
+        ens5:
+          dhcp4: true
+      version: 2
+  permissions: '0644'
+  owner: root:root
+
+# Knot DNS authoritative server configuration
+- path: /etc/knot/knot.conf
+  defer: true
+  content: |
+    ${indent(4, trimspace(knot_config))}
+  permissions: '0640'
+  owner: knot:knot
+
+# Knot Resolver configuration
+- path: /etc/knot-resolver/kresd.conf
+  defer: true
+  content: |
+    ${indent(4, trimspace(kresd_config))}
+  permissions: '0644'
+  owner: root:root
+
+# TLS certificate for DNS-over-TLS and DNS-over-QUIC
+- path: /etc/knot/dns.${domain}.crt
+  defer: true
+  content: |
+    ${indent(4, trimspace(tls_cert))}
+  permissions: '0644'
+  owner: knot:knot
+
+- path: /etc/knot/dns.${domain}.key
+  defer: true
+  content: |
+    ${indent(4, trimspace(tls_key))}
+  permissions: '0600'
+  owner: knot:knot
+
+- path: /etc/knot/root_ca.crt
+  defer: true
+  content: |
+    ${indent(4, trimspace(tls_ca))}
+  permissions: '0644'
+  owner: knot:knot
+
+# Symlink certs for Knot Resolver (uses different paths)
+- path: /etc/knot-resolver/dns.${domain}.crt
+  defer: true
+  content: |
+    ${indent(4, trimspace(tls_cert))}
+  permissions: '0644'
+  owner: root:root
+
+- path: /etc/knot-resolver/dns.${domain}.key
+  defer: true
+  content: |
+    ${indent(4, trimspace(tls_key))}
+  permissions: '0600'
+  owner: knot-resolver:knot-resolver
+
+- path: /etc/knot-resolver/root_ca.crt
+  defer: true
+  content: |
+    ${indent(4, trimspace(tls_ca))}
+  permissions: '0644'
+  owner: root:root
+
+runcmd:
+# Set default shell for crdant user
+- [ chsh, -s, /usr/bin/zsh, crdant ]
+
+# Restrict SSH access to ssher group
+- echo "AllowGroups ssher" > /etc/ssh/sshd_config.d/02-limit-to-ssher.conf
+
+# Apply netplan configuration
+- netplan apply
+
+# Create Knot DNS zone storage directory
+- mkdir -p /var/lib/knot/zones
+
+# Create stub zone files for each zone
+%{ for zone in dns_zones ~}
+- |
+  cat > /var/lib/knot/zones/${zone}.zone << 'ZONE'
+  $ORIGIN ${zone}.
+  $TTL 3600
+  @ IN SOA ${hostname}.${domain}. admin.${domain}. (
+      1       ; serial
+      3600    ; refresh
+      900     ; retry
+      604800  ; expire
+      3600    ; minimum
+  )
+  @ IN NS ${hostname}.${domain}.
+  ZONE
+%{ endfor ~}
+- chown -R knot:knot /var/lib/knot
+
+# Restart Knot DNS to pick up deferred config (service auto-started during package install)
+- systemctl enable knot
+- systemctl restart knot
+
+# Restart Knot Resolver to pick up deferred config
+- systemctl enable kresd@1
+- systemctl restart kresd@1
+
+%{ if tailscale_auth_key != "" ~}
+# Install and configure Tailscale
+- curl -fsSL https://tailscale.com/install.sh | sh
+- tailscale up --authkey=${tailscale_auth_key} --ssh
+%{ endif ~}

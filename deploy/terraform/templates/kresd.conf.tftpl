@@ -1,0 +1,44 @@
+-- Knot Resolver Configuration
+-- vim:syntax=lua:set ts=4 sw=4:
+-- Refer to manual: https://knot-resolver.readthedocs.org/en/stable/
+
+log_level('info')
+
+-- Network interface configuration
+-- Listen for DNS (UDP/TCP) on resolver IP
+net.listen('${resolver_ip}', 53, { kind = 'dns' })
+
+-- Listen for DNS-over-TLS on resolver IP
+net.listen('${resolver_ip}', 853, { kind = 'tls' })
+
+-- TLS certificate configuration
+net.tls("/etc/knot-resolver/dns.${domain}.crt", "/etc/knot-resolver/dns.${domain}.key")
+
+-- Disable DNSSEC validation for internal zones (they're not signed)
+trust_anchors.set_insecure({
+%{ for zone in dns_zones ~}
+    '${zone}.',
+%{ endfor ~}
+})
+
+-- Forward internal zones to authoritative servers over TLS
+-- All resolvers can forward to all authoritative servers for redundancy
+policy.add(policy.suffix(policy.TLS_FORWARD({
+%{ for auth_server in auth_servers ~}
+    {'${auth_server}@853', hostname='dns.${domain}', ca_file='/etc/knot-resolver/root_ca.crt'},
+%{ endfor ~}
+}), {
+%{ for zone in dns_zones ~}
+    todname('${zone}.'),
+%{ endfor ~}
+}))
+
+-- Load useful modules
+modules = {
+    'hints > iterate',  -- Allow loading /etc/hosts or custom root hints
+    'stats',            -- Track internal statistics
+    'predict',          -- Prefetch expiring/frequent records
+}
+
+-- Cache size
+cache.size = 100 * MB
