@@ -5,25 +5,9 @@
   - type: NS
     ttl: 3600
     values:
-      - cooper.lab.shortrib.net.
-      - maltman.lab.shortrib.net.
-      - stillman.lab.shortrib.net.
-      
-# infrastructure
-ns1:
-  - type: CNAME 
-    ttl: 60
-    value: cooper.lab.shortrib.net.
-
-ns2:
-  - type: CNAME 
-    ttl: 60
-    value: maltman.lab.shortrib.net.
-
-ns3:
-  - type: CNAME 
-    ttl: 60
-    value: stillman.lab.shortrib.net.
+      - cooper.shortrib.run.
+      - maltman.shortrib.run.
+      - stillman.shortrib.run.
 
 # platform
 registry:
