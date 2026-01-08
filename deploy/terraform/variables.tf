@@ -177,6 +177,11 @@ locals {
       tonumber(split(".", local.auth_ip_map[server])[3])
     )
   }
+  management_mac_map = { for server in local.all_servers : server =>
+    format("52:54:00:12:01:%02x",
+      tonumber(split(".", local.resolver_ip_map[server])[3])
+    )
+  }
 
   # Map hostname to index (for secondaries)
   secondary_index_map = { for idx, name in var.secondaries : name => idx }

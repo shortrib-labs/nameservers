@@ -42,6 +42,7 @@ resource "nutanix_virtual_machine" "primary" {
   # NIC 3 - Management network (SSH access)
   nic_list {
     subnet_uuid = data.nutanix_subnet.management.id
+    mac_address = local.management_mac_map[var.primary]
   }
 
   # Cloud-init configuration
