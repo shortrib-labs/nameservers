@@ -269,13 +269,13 @@ runcmd:
 %{ endfor ~}
 - chown -R knot:knot /var/lib/knot
 
-# Enable and start Knot DNS
+# Restart Knot DNS to pick up deferred config (service auto-started during package install)
 - systemctl enable knot
-- systemctl start knot
+- systemctl restart knot
 
-# Enable and start Knot Resolver
+# Restart Knot Resolver to pick up deferred config
 - systemctl enable kresd@1
-- systemctl start kresd@1
+- systemctl restart kresd@1
 
 %{ if tailscale_auth_key != "" ~}
 # Install and configure Tailscale
