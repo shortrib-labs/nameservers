@@ -59,56 +59,70 @@ users:
 %{ endif ~}
 %{ endfor ~}
 
+# Download CZ.NIC Labs GPG key before apt runs
+bootcmd:
+- mkdir -p /usr/share/keyrings
+- wget -q -O /usr/share/keyrings/cznic-labs-pkg.gpg https://pkg.labs.nic.cz/gpg
+
 # Update apt database and upgrade packages on first boot
 package_update: true
 package_upgrade: true
 
+# Add CZ.NIC Labs repositories for latest Knot DNS and Knot Resolver
+apt:
+  sources:
+    cznic-knot-dns:
+      source: "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-dns $RELEASE main"
+    cznic-knot-resolver:
+      source: "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-resolver $RELEASE main"
+
 ca_certs:
-# CN=Shortrib Labs Root E1
-- |
-  -----BEGIN CERTIFICATE-----
-  MIIBpDCCAUqgAwIBAgIQMrjGbvdzyD63/WrEiob28DAKBggqhkjOPQQDAjAgMR4w
-  HAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3QgRTEwHhcNMjIwNTA2MDEwNzUwWhcN
-  MzIwNTAzMDEwNzUwWjAgMR4wHAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3QgRTEw
-  WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASH3xjMX2xsnDZ7G0dxuVunoH7ZT4qO
-  yNwQfYvMI/ZiuvNV8KyYLqrcD4cigiuVWmjvSAqT5TOkIcD8s10iWZSKo2YwZDAO
-  BgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4EFgQU6qmj
-  Isxj08Ks5oM4jNfNu/0QxhcwHwYDVR0jBBgwFoAU6qmjIsxj08Ks5oM4jNfNu/0Q
-  xhcwCgYIKoZIzj0EAwIDSAAwRQIgCs9bM8Ax8RnPuHZWrgZodf/vJ6dce7OFeOZr
-  mdHeKP8CIQC/KLNuScd9FfpazDzAZYYPHR9vnDWCkYsJ+2NaiKdOew==
-  -----END CERTIFICATE-----
-# CN=Shortrib Labs Root R2
-- |
-  -----BEGIN CERTIFICATE-----
-  MIIFDzCCAvegAwIBAgIQZUk6BivvZNk/u0uKj2lxJTANBgkqhkiG9w0BAQsFADAg
-  MR4wHAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3QgUjIwHhcNMjMwNDI1MTk0OTEw
-  WhcNMzMwNDIyMTk0OTEwWjAgMR4wHAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3Qg
-  UjIwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQC40NpmZ3L8CcPnnP6w
-  G47D/OqmV23QW/q6HppSAPMocuojCoP8Go+4g1Am38fjfbe5AQnSQcrN7xthaRCb
-  nO5BERR0p3rPUbupbb+AMqzlBFpuGaFMSeXwWF5qrb8gG6XNineLWaDpwwrpOaNt
-  fLyJw4VIHAsNEs3qkA5/ctv9eDUNmtq/e6jpy0vZSRDcEp0PMima9oE6evaaddj0
-  TXdQRmiVeABCMO0m8h7dVEQmDGZq7P1lIMS7ZZHx+/w8tFzDRSeQoy1DzQrh7XMu
-  cN3BpeM/05hUvGUSChD2keXy8FdjI+zhuSRTRHvRkOBDqvVZ4R4wv7MqWhgfzzzH
-  zkl5oA40zGehctKLhUXnHcZaHmkUyPkSrqHC0vW/cPsrEou/q36gw2rvuInfC3/F
-  G0pKKATISr7nMQ1JxWNb8tCh2sj38RaVKYyj2p9iayAxudb8mO1O1ThQdhsJd3mY
-  4FEGwRLFXyty+Kgyt7Orb0yZazdH7C5wjIYU98OGk9kFjGr+uveblJapIa1C1g+f
-  JU0nA1PAix13Sxi8jk9Nj4hV1gYmWKRLtzkk4229SR/7HNh9C3kOpdJyuCgVQiPu
-  Gtk1jECice23HQ/BQNw7DSwFErek+75NcpIak1nmJ2BCc2JCx6YBrq8C3XYg+++l
-  duzcOKPp6uk+GK6UvBVwhxUblwIDAQABo0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYD
-  VR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4EFgQU/Q7uclwplHgnbFpZDoGzPkGL8XIw
-  DQYJKoZIhvcNAQELBQADggIBACHHjD7PTeKRjO7kPY2Gij9Mvm1cEz1NP18Bfc/P
-  9aAqv6iPQc1JmJgakZY2HU+BSoIMZVLa2vogqWy/o5OIRUGNy86Iws/05Ub7y0U9
-  fALFLwExWXaYYw0j3UJOk//zDDfybqvHMQEgGQuG3c7Nx1lM3P0pbMThivOzqjO8
-  DBN01nhuhIHfdXNoW5bGG2HJ2YfYXhkfYV9kC3+hg4S9Bdo+lz+l+7WdThkqdPBT
-  /HsTV8Op3KNJ5POzleJr1SIdOIg1UJp8gxYAkiCzNcGecM8PrhMVaCCfrD2/4z5V
-  oa3xDmY8aqP92bTr5p4M86LZ7eEqBKEYWkJQe6/NZaiWHoNj1p+q36i98Mtr79iK
-  RL2O/jaxmgh974tdPn9R82RKtylnsQiJzeT3Cc+vl10jq2Ne7aNCD6e1YWWXbloK
-  tAGVJ+GnBMVVJTZRV2TRDB58+SrxnzeeY3JtXHSMGxw2WC6ijx0NwfnsV4IMfPZ1
-  827F0FULk3vw1zHTE3q0zq+HTzWE6/MwVHgxLpJQF/LWzG8wYCg+CS4dyPXW0qX1
-  3sLOOGhLKlSle8MsRgjSbrCiinxFPVu93iF8Kj60oAjtSh2g+fcsFCHqYawyM9e5
-  6j7IvnxgE55Ps8n0blQW91bP0J1D9FAyb4ULUmt9N0/o36m8SpKLBAYE3HSX6ctG
-  5lsk
-  -----END CERTIFICATE-----
+  trusted:
+    # CN=Shortrib Labs Root E1
+    - |
+      -----BEGIN CERTIFICATE-----
+      MIIBpDCCAUqgAwIBAgIQMrjGbvdzyD63/WrEiob28DAKBggqhkjOPQQDAjAgMR4w
+      HAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3QgRTEwHhcNMjIwNTA2MDEwNzUwWhcN
+      MzIwNTAzMDEwNzUwWjAgMR4wHAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3QgRTEw
+      WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASH3xjMX2xsnDZ7G0dxuVunoH7ZT4qO
+      yNwQfYvMI/ZiuvNV8KyYLqrcD4cigiuVWmjvSAqT5TOkIcD8s10iWZSKo2YwZDAO
+      BgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4EFgQU6qmj
+      Isxj08Ks5oM4jNfNu/0QxhcwHwYDVR0jBBgwFoAU6qmjIsxj08Ks5oM4jNfNu/0Q
+      xhcwCgYIKoZIzj0EAwIDSAAwRQIgCs9bM8Ax8RnPuHZWrgZodf/vJ6dce7OFeOZr
+      mdHeKP8CIQC/KLNuScd9FfpazDzAZYYPHR9vnDWCkYsJ+2NaiKdOew==
+      -----END CERTIFICATE-----
+    # CN=Shortrib Labs Root R2
+    - |
+      -----BEGIN CERTIFICATE-----
+      MIIFDzCCAvegAwIBAgIQZUk6BivvZNk/u0uKj2lxJTANBgkqhkiG9w0BAQsFADAg
+      MR4wHAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3QgUjIwHhcNMjMwNDI1MTk0OTEw
+      WhcNMzMwNDIyMTk0OTEwWjAgMR4wHAYDVQQDExVTaG9ydHJpYiBMYWJzIFJvb3Qg
+      UjIwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQC40NpmZ3L8CcPnnP6w
+      G47D/OqmV23QW/q6HppSAPMocuojCoP8Go+4g1Am38fjfbe5AQnSQcrN7xthaRCb
+      nO5BERR0p3rPUbupbb+AMqzlBFpuGaFMSeXwWF5qrb8gG6XNineLWaDpwwrpOaNt
+      fLyJw4VIHAsNEs3qkA5/ctv9eDUNmtq/e6jpy0vZSRDcEp0PMima9oE6evaaddj0
+      TXdQRmiVeABCMO0m8h7dVEQmDGZq7P1lIMS7ZZHx+/w8tFzDRSeQoy1DzQrh7XMu
+      cN3BpeM/05hUvGUSChD2keXy8FdjI+zhuSRTRHvRkOBDqvVZ4R4wv7MqWhgfzzzH
+      zkl5oA40zGehctKLhUXnHcZaHmkUyPkSrqHC0vW/cPsrEou/q36gw2rvuInfC3/F
+      G0pKKATISr7nMQ1JxWNb8tCh2sj38RaVKYyj2p9iayAxudb8mO1O1ThQdhsJd3mY
+      4FEGwRLFXyty+Kgyt7Orb0yZazdH7C5wjIYU98OGk9kFjGr+uveblJapIa1C1g+f
+      JU0nA1PAix13Sxi8jk9Nj4hV1gYmWKRLtzkk4229SR/7HNh9C3kOpdJyuCgVQiPu
+      Gtk1jECice23HQ/BQNw7DSwFErek+75NcpIak1nmJ2BCc2JCx6YBrq8C3XYg+++l
+      duzcOKPp6uk+GK6UvBVwhxUblwIDAQABo0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYD
+      VR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4EFgQU/Q7uclwplHgnbFpZDoGzPkGL8XIw
+      DQYJKoZIhvcNAQELBQADggIBACHHjD7PTeKRjO7kPY2Gij9Mvm1cEz1NP18Bfc/P
+      9aAqv6iPQc1JmJgakZY2HU+BSoIMZVLa2vogqWy/o5OIRUGNy86Iws/05Ub7y0U9
+      fALFLwExWXaYYw0j3UJOk//zDDfybqvHMQEgGQuG3c7Nx1lM3P0pbMThivOzqjO8
+      DBN01nhuhIHfdXNoW5bGG2HJ2YfYXhkfYV9kC3+hg4S9Bdo+lz+l+7WdThkqdPBT
+      /HsTV8Op3KNJ5POzleJr1SIdOIg1UJp8gxYAkiCzNcGecM8PrhMVaCCfrD2/4z5V
+      oa3xDmY8aqP92bTr5p4M86LZ7eEqBKEYWkJQe6/NZaiWHoNj1p+q36i98Mtr79iK
+      RL2O/jaxmgh974tdPn9R82RKtylnsQiJzeT3Cc+vl10jq2Ne7aNCD6e1YWWXbloK
+      tAGVJ+GnBMVVJTZRV2TRDB58+SrxnzeeY3JtXHSMGxw2WC6ijx0NwfnsV4IMfPZ1
+      827F0FULk3vw1zHTE3q0zq+HTzWE6/MwVHgxLpJQF/LWzG8wYCg+CS4dyPXW0qX1
+      3sLOOGhLKlSle8MsRgjSbrCiinxFPVu93iF8Kj60oAjtSh2g+fcsFCHqYawyM9e5
+      6j7IvnxgE55Ps8n0blQW91bP0J1D9FAyb4ULUmt9N0/o36m8SpKLBAYE3HSX6ctG
+      5lsk
+      -----END CERTIFICATE-----
 
 write_files:
 # SSH hardening configuration
@@ -152,13 +166,13 @@ write_files:
     network:
       ethernets:
         # NIC 1 - Resolver service
-        ens192:
+        ens3:
           dhcp4: true
         # NIC 2 - Authoritative service
-        ens224:
+        ens4:
           dhcp4: true
         # NIC 3 - Management
-        ens256:
+        ens5:
           dhcp4: true
       version: 2
   permissions: '0644'
@@ -217,6 +231,13 @@ write_files:
   permissions: '0600'
   owner: knot-resolver:knot-resolver
 
+- path: /etc/knot-resolver/root_ca.crt
+  defer: true
+  content: |
+    ${indent(4, trimspace(tls_ca))}
+  permissions: '0644'
+  owner: root:root
+
 runcmd:
 # Set default shell for crdant user
 - [ chsh, -s, /usr/bin/zsh, crdant ]
@@ -229,6 +250,23 @@ runcmd:
 
 # Create Knot DNS zone storage directory
 - mkdir -p /var/lib/knot/zones
+
+# Create stub zone files for each zone
+%{ for zone in dns_zones ~}
+- |
+  cat > /var/lib/knot/zones/${zone}.zone << 'ZONE'
+  $ORIGIN ${zone}.
+  $TTL 3600
+  @ IN SOA ${hostname}.${domain}. admin.${domain}. (
+      1       ; serial
+      3600    ; refresh
+      900     ; retry
+      604800  ; expire
+      3600    ; minimum
+  )
+  @ IN NS ${hostname}.${domain}.
+  ZONE
+%{ endfor ~}
 - chown -R knot:knot /var/lib/knot
 
 # Enable and start Knot DNS
