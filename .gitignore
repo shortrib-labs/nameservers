@@ -1,3 +1,5 @@
+.direnv
+
 .worktrees
 secrets/*
 !secrets/params.yaml
@@ -40,3 +42,33 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Python (OctoDNS requirement)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# OctoDNS
+.octodns/
+octodns.log
+
+# Environment files
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

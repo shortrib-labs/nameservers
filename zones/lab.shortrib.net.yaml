@@ -1,0 +1,272 @@
+---
+# lab.shortrib.net zone - internal lab infrastructure
+
+'':
+  - type: NS
+    ttl: 3600
+    values: 
+      - cooper.lab.shortrib.net.
+      - maltman.lab.shortrib.net.
+      - stillman.lab.shortrib.net.
+
+ns1:
+  - type: CNAME 
+    ttl: 60
+    value: cooper.lab.shortrib.net.
+
+ns2:
+  - type: CNAME 
+    ttl: 60
+    value: maltman.lab.shortrib.net.
+
+ns3:
+  - type: CNAME 
+    ttl: 60
+    value: stillman.lab.shortrib.net.
+
+# infrastructure
+lynearm:
+  - type: A
+    ttl: 60
+    value: 10.18.1.1
+  - type: AAAA
+    ttl: 60
+    value: 2600:4040:5c56:b940::7b7
+
+router:
+  - type: CNAME
+    ttl: 60
+    value: lynearm.lab.shortrib.net.
+
+underback:
+  - type: A
+    ttl: 60
+    value: 10.18.0.209
+
+washback:
+  - type: A
+    ttl: 60
+    value: 10.18.0.207
+
+manifold:
+  - type: A
+    ttl: 60
+    value: 10.18.0.206
+
+switch:
+  - type: CNAME
+    ttl: 60
+    value: underback.lab.shortrib.net.
+
+switch1:
+  - type: CNAME
+    ttl: 60
+    value: underback.lab.shortrib.net.
+
+switch2:
+  - type: CNAME
+    ttl: 60
+    value: washback.lab.shortrib.net.
+
+# dns servers
+exciseman:
+  - type: A
+    ttl: 60
+    value: 10.105.0.2
+
+cooper:
+  - type: A
+    ttl: 60
+    value: 10.18.1.252
+
+maltman:
+  - type: A
+    ttl: 60
+    value: 10.18.1.253
+
+stillman:
+  - type: A
+    ttl: 60
+    value: 10.18.1.254
+
+# hosts
+malt:
+  - type: A
+    ttl: 60
+    value: 10.18.1.100
+
+shine:
+  - type: A
+    ttl: 60
+    value: 10.18.1.120
+
+scotch:
+  - type: A
+    ttl: 60
+    value: 10.18.1.110
+
+bourbon:
+  - type: A
+    ttl: 60
+    value: 10.18.1.210
+
+rye:
+  - type: A
+    ttl: 60
+    value: 10.18.1.220
+
+# nutanix hypervisors
+hypervisor.scotch:
+  - type: CNAME
+    ttl: 60
+    value: ahv.scotch.lab.shortrib.net.
+
+hypervisor.bourbon:
+  - type: CNAME
+    ttl: 60
+    value: ahv.bourbon.lab.shortrib.net.
+
+hypervisor.rye:
+  - type: CNAME
+    ttl: 60
+    value: ahv.rye.lab.shortrib.net.
+
+ahv.scotch:
+  - type: A
+    ttl: 60
+    value: 10.18.1.111
+
+ahv.bourbon:
+  - type: A
+    ttl: 60
+    value: 10.18.1.211
+
+ahv.rye:
+  - type: A
+    ttl: 60
+    value: 10.18.1.221
+
+# nutanix cluster
+homelab:
+  - type: A
+    ttl: 60
+    values:
+      - 10.18.1.110
+      - 10.18.1.210
+      - 10.18.1.220
+
+# host management
+ipmi.bourbon:
+  - type: A
+    ttl: 60
+    value: 10.17.0.210
+
+ipmi.rye:
+  - type: A
+    ttl: 60
+    value: 10.17.0.220
+
+ipmi.scotch:
+  - type: A
+    ttl: 60
+    value: 10.17.0.110
+
+# management
+certificates:
+  - type: A
+    ttl: 60
+    value: 10.18.1.50
+
+prism:
+  - type: A
+    ttl: 60
+    value: 10.18.1.240
+
+# services
+docker:
+  - type: A
+    ttl: 60
+    value: 10.105.0.16
+
+thumper:
+  - type: A
+    ttl: 60
+    value: 10.105.0.35
+
+proxy:
+  - type: CNAME
+    ttl: 60
+    value: thumper.lab.shortrib.net.
+
+# clients
+mash:
+  - type: A
+    ttl: 60
+    value: 10.25.0.30
+
+# k0s clusters and nodes
+opossum:
+  - type: A
+    ttl: 60
+    value: 10.24.1.10
+
+muskrat:
+  - type: A
+    ttl: 60
+    value: 10.24.2.10
+
+ferret:
+  - type: A
+    ttl: 60
+    value: 10.24.3.10
+
+nutria:
+  - type: A
+    ttl: 60
+    value: 10.24.4.10
+
+skunk:
+  - type: A
+    ttl: 60
+    value: 10.24.5.10
+
+raccoon:
+  - type: A
+    ttl: 60
+    value: 10.24.6.10
+
+squirrel:
+  - type: A
+    ttl: 60
+    value: 10.24.7.10
+
+marten:
+  - type: A
+    ttl: 60
+    value: 10.24.8.10
+
+vole:
+  - type: A
+    ttl: 60
+    value: 10.24.9.10
+
+marmot:
+  - type: A
+    ttl: 60
+    value: 10.24.10.10
+
+# airgap k0s clusters and nodes
+armadillo:
+  - type: A
+    ttl: 60
+    value: 10.21.1.10
+
+chinchilla:
+  - type: A
+    ttl: 60
+    value: 10.21.2.10
+
+hamster:
+  - type: A
+    ttl: 60
+    value: 10.21.3.10
