@@ -1,13 +1,25 @@
 creation_rules:
 - path: secrets/params.yaml
-  encrypted_regex: '^(password|api-key|default_password|client_secret|key)$'
-  pgp: 905EBD494A6AA2B774ED5C67621620CDA290611D
+  encrypted_regex: '^(password|api-key|default_password|client_secret|key|auth_key)$'
+  pgp: >-
+    905EBD494A6AA2B774ED5C67621620CDA290611D!,
+    29451B3218DDD551B34905DF88C11C4B40CA0A07!,
+    A2164C4257BB2EBFA51F26E948A64E8333B82F50!,
+    E9C1160A92D3C4F10F6B7BE50094148871DE2F0B!
 - path: base/capv-system
   encrypted_regex: '^(VSPHERE_USERNAME|VSPHERE_PASSWORD)$'
-  pgp: 905EBD494A6AA2B774ED5C67621620CDA290611D
+  pgp: >-
+    905EBD494A6AA2B774ED5C67621620CDA290611D!,
+    29451B3218DDD551B34905DF88C11C4B40CA0A07!,
+    A2164C4257BB2EBFA51F26E948A64E8333B82F50!,
+    E9C1160A92D3C4F10F6B7BE50094148871DE2F0B!
 - encrypted_regex: '^(data|stringData)$'
   # Base is shared, you can add keys from each environment that uses base here
-  pgp: 905EBD494A6AA2B774ED5C67621620CDA290611D
+  pgp: >-
+    905EBD494A6AA2B774ED5C67621620CDA290611D!,
+    29451B3218DDD551B34905DF88C11C4B40CA0A07!,
+    A2164C4257BB2EBFA51F26E948A64E8333B82F50!,
+    E9C1160A92D3C4F10F6B7BE50094148871DE2F0B!
 #    ,ANOTHER_FALSE_KEY_HERE
 # You can also isolate each key to specific directories by uncommenting the next 7 lines and adding the appropriate fingerprints
 #  path_regex: base/.*
