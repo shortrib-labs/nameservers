@@ -7,10 +7,13 @@ PARAMS_FILE="secrets/params.yaml"
 
 # Check if params.yaml is being committed
 if git diff --cached --name-only | grep -q "^${PARAMS_FILE}$"; then
-    # Write staged content to temp file for sops to check
-    TMPFILE=$(mktemp -t params.XXXXXX.yaml)
-    chmod 600 "$TMPFILE"
-    trap "rm -f '$TMPFILE'" EXIT
+    # Write staged content to temp file for sops to check. Use a temp
+    # directory so the file keeps its .yaml extension on both GNU and
+    # BSD mktemp (BSD appends a random suffix after the template).
+    TMPDIR_SOPS=$(mktemp -d -t params)
+    TMPFILE="${TMPDIR_SOPS}/params.yaml"
+    trap "rm -rf '$TMPDIR_SOPS'" EXIT
+    ( umask 077; : > "$TMPFILE" )
 
     git show ":${PARAMS_FILE}" > "$TMPFILE" 2>/dev/null
 
