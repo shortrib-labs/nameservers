@@ -6,6 +6,8 @@ Deploy a redundant DNS infrastructure on Nutanix AHV using Terraform. This proje
 
 Each nameserver has **two IPs**: one for the resolver service and one for the authoritative service.
 
+The three VMs carry an `AntiAffinity: nameservers` category bound to a Prism Central VM-VM anti-affinity policy, so AHV keeps them on separate hosts.
+
 ```
                               ┌─────────────────────────────────────────┐
                               │      All Resolvers Forward to All       │
@@ -105,7 +107,8 @@ MAC addresses are derived from IPs using OUI `52:54:00` + last 3 octets as hex. 
 
 ### Nutanix Prerequisites
 
-- Nutanix AHV cluster with Prism Central
+- Nutanix AHV cluster with Prism Central (pc.2024.3 / AOS 7.0 or later, for category-based anti-affinity policies)
+- Three or more AHV hosts for the anti-affinity policy to be fully compliant (the policy is soft-enforced, so fewer hosts still deploy)
 - Two subnets with IPAM configured:
   - `infra` - For DNS service IPs
   - `management` - For SSH access
