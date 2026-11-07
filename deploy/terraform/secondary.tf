@@ -14,6 +14,12 @@ resource "nutanix_virtual_machine" "secondary" {
   # Cluster placement
   cluster_uuid = data.nutanix_cluster.cluster.id
 
+  # Anti-affinity group (see affinity.tf)
+  categories {
+    name  = nutanix_category_v2.nameservers.key
+    value = nutanix_category_v2.nameservers.value
+  }
+
   # Boot type - Ubuntu cloud images use UEFI
   boot_type = "UEFI"
 
